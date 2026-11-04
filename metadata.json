@@ -1,0 +1,6 @@
+{
+  "name": "WhiskerWatch Hydra",
+  "description": "AI-powered feline colony monitoring, health tracking, and sanctuary management platform for Hydra.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

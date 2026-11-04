@@ -1,0 +1,401 @@
+{
+  "entities": {
+    "CatProfile": {
+      "title": "CatProfile",
+      "description": "Registered feline profile in the Hydra island colony registry.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name or identifier of the cat.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "colonyZone": {
+          "type": "string",
+          "description": "Hydra island zone where the cat primarily resides.",
+          "enum": [
+            "Hydra Port",
+            "Kamini Harbor",
+            "Vlychos",
+            "Kaminia",
+            "Kiafa",
+            "Mandraki"
+          ],
+          "maxLength": 40
+        },
+        "coatPattern": {
+          "type": "string",
+          "description": "Visual coat coloration and pattern.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "sex": {
+          "type": "string",
+          "description": "Biological sex of the cat.",
+          "enum": ["Female", "Male", "Unknown"],
+          "maxLength": 20
+        },
+        "tnrStatus": {
+          "type": "string",
+          "description": "Trap-Neuter-Return sterilization status.",
+          "enum": [
+            "Sterilized (Ear-Tipped)",
+            "Intact - Priority TNR",
+            "Kitten - Underage",
+            "Scheduled"
+          ],
+          "maxLength": 40
+        },
+        "healthStatus": {
+          "type": "string",
+          "description": "Current veterinary triage and health state.",
+          "enum": [
+            "Healthy",
+            "Monitor",
+            "Needs Vet Care",
+            "In Treatment"
+          ],
+          "maxLength": 40
+        },
+        "estimatedAge": {
+          "type": "string",
+          "description": "Estimated age of the cat.",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "microchipId": {
+          "type": "string",
+          "description": "Optional microchip number or tag code.",
+          "maxLength": 40
+        },
+        "markingsDescription": {
+          "type": "string",
+          "description": "Distinguishing visual markings, ear-tip side, and facial features.",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "medicalNotes": {
+          "type": "string",
+          "description": "Veterinary history, antiparasitic treatments, and clinical notes.",
+          "maxLength": 1000
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "Firebase Storage download URL or data reference for the cat photo.",
+          "maxLength": 1000
+        },
+        "storagePath": {
+          "type": "string",
+          "description": "Firebase Storage object path in the dedicated Hydra bucket.",
+          "maxLength": 400
+        },
+        "lastSeenZone": {
+          "type": "string",
+          "description": "Most recent sighting zone in Hydra.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "lastSeenText": {
+          "type": "string",
+          "description": "Human-readable date or summary of most recent sighting.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the caretaker who registered the record.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "reporterName": {
+          "type": "string",
+          "description": "Display name of the caretaker or volunteer.",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the record was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the record was last updated."
+        }
+      },
+      "required": [
+        "name",
+        "colonyZone",
+        "coatPattern",
+        "sex",
+        "tnrStatus",
+        "healthStatus",
+        "estimatedAge",
+        "microchipId",
+        "markingsDescription",
+        "medicalNotes",
+        "photoUrl",
+        "storagePath",
+        "lastSeenZone",
+        "lastSeenText",
+        "ownerId",
+        "reporterName",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SightingLog": {
+      "title": "SightingLog",
+      "description": "Field sighting, feeding log, or AI visual triage entry for a Hydra colony cat.",
+      "type": "object",
+      "properties": {
+        "catId": {
+          "type": "string",
+          "description": "Reference ID of the cat in /cats/{catId}.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "catName": {
+          "type": "string",
+          "description": "Name of the cat observed.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "colonyZone": {
+          "type": "string",
+          "description": "Hydra island zone where the sighting occurred.",
+          "enum": [
+            "Hydra Port",
+            "Kamini Harbor",
+            "Vlychos",
+            "Kaminia",
+            "Kiafa",
+            "Mandraki"
+          ],
+          "maxLength": 40
+        },
+        "coordinatesLabel": {
+          "type": "string",
+          "description": "Specific landmark or street step location on Hydra.",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "behaviorNotes": {
+          "type": "string",
+          "description": "Field observation notes on appetite, mobility, and demeanor.",
+          "minLength": 1,
+          "maxLength": 800
+        },
+        "healthObservation": {
+          "type": "string",
+          "description": "Observed health status at time of sighting.",
+          "enum": [
+            "Healthy",
+            "Monitor",
+            "Needs Vet Care",
+            "In Treatment"
+          ],
+          "maxLength": 40
+        },
+        "fedStatus": {
+          "type": "string",
+          "description": "Care action taken during the sighting.",
+          "enum": [
+            "Fed & Watered",
+            "Observed Only",
+            "Medication Given",
+            "Trapped for TNR"
+          ],
+          "maxLength": 40
+        },
+        "aiAnalysisSummary": {
+          "type": "string",
+          "description": "Summary generated by WhiskerWatch AI vision or triage model.",
+          "maxLength": 1000
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "Optional Firebase Storage URL for sighting photo.",
+          "maxLength": 1000
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the volunteer who logged the sighting.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "reporterName": {
+          "type": "string",
+          "description": "Display name of the volunteer who logged the sighting.",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the sighting was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the sighting was last updated."
+        }
+      },
+      "required": [
+        "catId",
+        "catName",
+        "colonyZone",
+        "coordinatesLabel",
+        "behaviorNotes",
+        "healthObservation",
+        "fedStatus",
+        "aiAnalysisSummary",
+        "photoUrl",
+        "ownerId",
+        "reporterName",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "FeedingStation": {
+      "title": "FeedingStation",
+      "description": "Hydra island feeding and fresh water station status record.",
+      "type": "object",
+      "properties": {
+        "stationName": {
+          "type": "string",
+          "description": "Name of the feeding station landmark.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "colonyZone": {
+          "type": "string",
+          "description": "Hydra island zone where the station is located.",
+          "enum": [
+            "Hydra Port",
+            "Kamini Harbor",
+            "Vlychos",
+            "Kaminia",
+            "Kiafa",
+            "Mandraki"
+          ],
+          "maxLength": 40
+        },
+        "supplyLevel": {
+          "type": "string",
+          "description": "Dry/wet food supply status.",
+          "enum": [
+            "Full",
+            "Adequate",
+            "Low - Refill Soon",
+            "Empty - Urgent"
+          ],
+          "maxLength": 40
+        },
+        "waterStatus": {
+          "type": "string",
+          "description": "Fresh water bowl cleanliness and fill state.",
+          "enum": [
+            "Fresh & Full",
+            "Needs Cleaning",
+            "Refill Required"
+          ],
+          "maxLength": 40
+        },
+        "dailyCatCount": {
+          "type": "integer",
+          "description": "Estimated number of cats visiting this station daily."
+        },
+        "assignedCaretaker": {
+          "type": "string",
+          "description": "Primary caretaker responsible for the station.",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "notes": {
+          "type": "string",
+          "description": "Logistics or maintenance notes for volunteers.",
+          "maxLength": 600
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the caretaker managing this station.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the station was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the station was last updated."
+        }
+      },
+      "required": [
+        "stationName",
+        "colonyZone",
+        "supplyLevel",
+        "waterStatus",
+        "dailyCatCount",
+        "assignedCaretaker",
+        "notes",
+        "ownerId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Trusted administrator lookup document for role-based access control.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Admin user UID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "role": {
+          "type": "string",
+          "description": "Explicit admin role marker.",
+          "enum": ["admin"],
+          "maxLength": 20
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp."
+        }
+      },
+      "required": ["uid", "role", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/cats/{catId}": {
+      "schema": "CatProfile",
+      "description": "Hydra feline colony profiles owned by the authenticated caretaker."
+    },
+    "/sightings/{sightingId}": {
+      "schema": "SightingLog",
+      "description": "Hydra colony field sightings and AI triage logs."
+    },
+    "/stations/{stationId}": {
+      "schema": "FeedingStation",
+      "description": "Hydra island feeding and water station records."
+    },
+    "/admins/{adminId}": {
+      "schema": "AdminRecord",
+      "description": "Administrator role lookup collection."
+    }
+  }
+}

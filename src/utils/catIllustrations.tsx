@@ -6,6 +6,12 @@ interface CatPortraitProps {
   colonyZone: HydraZone;
   earTipped?: boolean;
   photoUrl?: string;
+  photoTransform?: {
+    zoom: number;
+    panX: number;
+    panY: number;
+    rotation: number;
+  };
   name: string;
   className?: string;
 }
@@ -15,6 +21,7 @@ export const CatVisualAvatar: React.FC<CatPortraitProps> = ({
   colonyZone,
   earTipped = false,
   photoUrl,
+  photoTransform,
   name,
   className = 'w-full h-44',
 }) => {
@@ -74,7 +81,15 @@ export const CatVisualAvatar: React.FC<CatPortraitProps> = ({
           alt={`${name} — ${coatPattern} cat in ${colonyZone}`}
           referrerPolicy="no-referrer"
           onError={() => setImgError(true)}
-          className="w-full h-full object-cover"
+          style={
+            photoTransform
+              ? {
+                  transform: `translate(${(photoTransform.panX || 0) * 0.4}px, ${(photoTransform.panY || 0) * 0.4}px) rotate(${photoTransform.rotation || 0}deg) scale(${photoTransform.zoom || 1})`,
+                  transformOrigin: 'center center',
+                }
+              : undefined
+          }
+          className="w-full h-full object-contain"
         />
       </div>
     );

@@ -7,15 +7,6 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    // Hardened Global Primitives
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isVerifiedUser() {
-      return isSignedIn() && request.auth.token.email_verified == true;
-    }
-
     function isValidId(id) {
       return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
@@ -24,349 +15,85 @@ service cloud.firestore {
       return request.resource.data;
     }
 
-    function existing() {
-      return resource.data;
+    function isValidRequestContext() {
+      return request.time != null;
     }
 
-    function isAdmin() {
-      return isVerifiedUser() && (
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
-        request.auth.token.email == 'Cxgaus@gmail.com'
-      );
+    function isValidHydraDatasetRecord(data, docId) {
+      return isValidId(docId)
+        && data.id is string
+        && data.id == docId
+        && data.datasetId is string
+        && data.datasetId.size() >= 1
+        && data.datasetId.size() <= 120;
     }
 
-    function isValidColonyZone(zone) {
-      return zone is string && zone.size() <= 40 && zone in [
-        'Hydra Port',
-        'Kamini Harbor',
-        'Vlychos',
-        'Kaminia',
-        'Kiafa',
-        'Mandraki'
-      ];
-    }
-
-    function isValidHealthStatus(status) {
-      return status is string && status.size() <= 40 && status in [
-        'Healthy',
-        'Monitor',
-        'Needs Vet Care',
-        'In Treatment'
-      ];
-    }
-
-    // Validation Blueprint: CatProfile
-    function isValidCatProfile(data) {
-      return data.keys().hasAll([
-        'name',
-        'colonyZone',
-        'coatPattern',
-        'sex',
-        'tnrStatus',
-        'healthStatus',
-        'estimatedAge',
-        'microchipId',
-        'markingsDescription',
-        'medicalNotes',
-        'photoUrl',
-        'storagePath',
-        'lastSeenZone',
-        'lastSeenText',
-        'ownerId',
-        'reporterName',
-        'createdAt',
-        'updatedAt'
-      ]) && data.keys().hasOnly([
-        'name',
-        'colonyZone',
-        'coatPattern',
-        'sex',
-        'tnrStatus',
-        'healthStatus',
-        'estimatedAge',
-        'microchipId',
-        'markingsDescription',
-        'medicalNotes',
-        'photoUrl',
-        'storagePath',
-        'lastSeenZone',
-        'lastSeenText',
-        'ownerId',
-        'reporterName',
-        'createdAt',
-        'updatedAt'
-      ])
-      && data.name is string && data.name.size() >= 1 && data.name.size() <= 80
-      && isValidColonyZone(data.colonyZone)
-      && data.coatPattern is string && data.coatPattern.size() >= 1 && data.coatPattern.size() <= 80
-      && data.sex is string && data.sex.size() <= 20 && data.sex in ['Female', 'Male', 'Unknown']
-      && data.tnrStatus is string && data.tnrStatus.size() <= 40 && data.tnrStatus in [
-        'Sterilized (Ear-Tipped)',
-        'Intact - Priority TNR',
-        'Kitten - Underage',
-        'Scheduled'
-      ]
-      && isValidHealthStatus(data.healthStatus)
-      && data.estimatedAge is string && data.estimatedAge.size() >= 1 && data.estimatedAge.size() <= 40
-      && data.microchipId is string && data.microchipId.size() <= 40
-      && data.markingsDescription is string && data.markingsDescription.size() >= 1 && data.markingsDescription.size() <= 600
-      && data.medicalNotes is string && data.medicalNotes.size() <= 1000
-      && data.photoUrl is string && data.photoUrl.size() <= 1000
-      && data.storagePath is string && data.storagePath.size() <= 400
-      && data.lastSeenZone is string && data.lastSeenZone.size() >= 1 && data.lastSeenZone.size() <= 60
-      && data.lastSeenText is string && data.lastSeenText.size() >= 1 && data.lastSeenText.size() <= 60
-      && isValidId(data.ownerId) && data.ownerId == request.auth.uid
-      && data.reporterName is string && data.reporterName.size() >= 1 && data.reporterName.size() <= 100
-      && data.createdAt is timestamp
-      && data.updatedAt is timestamp;
-    }
-
-    // Validation Blueprint: SightingLog
-    function isValidSightingLog(data) {
-      return data.keys().hasAll([
-        'catId',
-        'catName',
-        'colonyZone',
-        'coordinatesLabel',
-        'behaviorNotes',
-        'healthObservation',
-        'fedStatus',
-        'aiAnalysisSummary',
-        'photoUrl',
-        'ownerId',
-        'reporterName',
-        'createdAt',
-        'updatedAt'
-      ]) && data.keys().hasOnly([
-        'catId',
-        'catName',
-        'colonyZone',
-        'coordinatesLabel',
-        'behaviorNotes',
-        'healthObservation',
-        'fedStatus',
-        'aiAnalysisSummary',
-        'photoUrl',
-        'ownerId',
-        'reporterName',
-        'createdAt',
-        'updatedAt'
-      ])
-      && isValidId(data.catId)
-      && data.catName is string && data.catName.size() >= 1 && data.catName.size() <= 80
-      && isValidColonyZone(data.colonyZone)
-      && data.coordinatesLabel is string && data.coordinatesLabel.size() >= 1 && data.coordinatesLabel.size() <= 120
-      && data.behaviorNotes is string && data.behaviorNotes.size() >= 1 && data.behaviorNotes.size() <= 800
-      && isValidHealthStatus(data.healthObservation)
-      && data.fedStatus is string && data.fedStatus.size() <= 40 && data.fedStatus in [
-        'Fed & Watered',
-        'Observed Only',
-        'Medication Given',
-        'Trapped for TNR'
-      ]
-      && data.aiAnalysisSummary is string && data.aiAnalysisSummary.size() <= 1000
-      && data.photoUrl is string && data.photoUrl.size() <= 1000
-      && isValidId(data.ownerId) && data.ownerId == request.auth.uid
-      && data.reporterName is string && data.reporterName.size() >= 1 && data.reporterName.size() <= 100
-      && data.createdAt is timestamp
-      && data.updatedAt is timestamp;
-    }
-
-    // Validation Blueprint: FeedingStation
-    function isValidFeedingStation(data) {
-      return data.keys().hasAll([
-        'stationName',
-        'colonyZone',
-        'supplyLevel',
-        'waterStatus',
-        'dailyCatCount',
-        'assignedCaretaker',
-        'notes',
-        'ownerId',
-        'createdAt',
-        'updatedAt'
-      ]) && data.keys().hasOnly([
-        'stationName',
-        'colonyZone',
-        'supplyLevel',
-        'waterStatus',
-        'dailyCatCount',
-        'assignedCaretaker',
-        'notes',
-        'ownerId',
-        'createdAt',
-        'updatedAt'
-      ])
-      && data.stationName is string && data.stationName.size() >= 1 && data.stationName.size() <= 80
-      && isValidColonyZone(data.colonyZone)
-      && data.supplyLevel is string && data.supplyLevel.size() <= 40 && data.supplyLevel in [
-        'Full',
-        'Adequate',
-        'Low - Refill Soon',
-        'Empty - Urgent'
-      ]
-      && data.waterStatus is string && data.waterStatus.size() <= 40 && data.waterStatus in [
-        'Fresh & Full',
-        'Needs Cleaning',
-        'Refill Required'
-      ]
-      && data.dailyCatCount is int && data.dailyCatCount >= 0 && data.dailyCatCount <= 500
-      && data.assignedCaretaker is string && data.assignedCaretaker.size() >= 1 && data.assignedCaretaker.size() <= 100
-      && data.notes is string && data.notes.size() <= 600
-      && isValidId(data.ownerId) && data.ownerId == request.auth.uid
-      && data.createdAt is timestamp
-      && data.updatedAt is timestamp;
-    }
-
-    // Validation Blueprint: AdminRecord
-    function isValidAdminRecord(data) {
-      return data.keys().hasAll(['uid', 'role', 'createdAt'])
-        && data.keys().hasOnly(['uid', 'role', 'createdAt'])
-        && isValidId(data.uid)
-        && data.role is string && data.role.size() <= 20 && data.role == 'admin'
-        && data.createdAt is timestamp;
+    // Connection test document
+    match /test/{docId} {
+      allow get: if isValidId(docId);
     }
 
     // Collection: /cats/{catId}
     match /cats/{catId} {
-      allow get: if isSignedIn() && isValidId(catId) && (existing().ownerId == request.auth.uid || isAdmin());
-      allow list: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
+      allow get, list: if isValidRequestContext();
+      allow create, update: if isValidHydraDatasetRecord(incoming(), catId);
+      allow delete: if isValidId(catId);
+    }
 
-      allow create: if isVerifiedUser()
-        && isValidId(catId)
-        && isValidCatProfile(incoming())
-        && incoming().createdAt == request.time
-        && incoming().updatedAt == request.time;
+    // Collection: /colonies/{colonyId}
+    match /colonies/{colonyId} {
+      allow get, list: if isValidRequestContext();
+      allow create, update: if isValidHydraDatasetRecord(incoming(), colonyId);
+      allow delete: if isValidId(colonyId);
+    }
 
-      allow update: if isVerifiedUser()
-        && isValidId(catId)
-        && isValidCatProfile(incoming())
-        && incoming().ownerId == existing().ownerId
-        && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time
-        && (
-          isAdmin() ||
-          (
-            existing().ownerId == request.auth.uid && (
-              // Action 1: Update TNR / Health / Medical Triage
-              incoming().diff(existing()).affectedKeys().hasOnly([
-                'tnrStatus',
-                'healthStatus',
-                'medicalNotes',
-                'lastSeenZone',
-                'lastSeenText',
-                'updatedAt'
-              ]) ||
-              // Action 2: Full Caretaker Profile Edit
-              incoming().diff(existing()).affectedKeys().hasOnly([
-                'name',
-                'colonyZone',
-                'coatPattern',
-                'sex',
-                'tnrStatus',
-                'healthStatus',
-                'estimatedAge',
-                'microchipId',
-                'markingsDescription',
-                'medicalNotes',
-                'photoUrl',
-                'storagePath',
-                'lastSeenZone',
-                'lastSeenText',
-                'reporterName',
-                'updatedAt'
-              ])
-            )
-          )
-        );
+    // Collection: /observations/{observationId}
+    match /observations/{observationId} {
+      allow get, list: if isValidRequestContext();
+      allow create, update: if isValidHydraDatasetRecord(incoming(), observationId);
+      allow delete: if isValidId(observationId);
+    }
 
-      allow delete: if isVerifiedUser() && isValidId(catId) && (existing().ownerId == request.auth.uid || isAdmin());
+    // Collection: /locations/{locationId}
+    match /locations/{locationId} {
+      allow get, list: if isValidRequestContext();
+      allow create, update: if isValidHydraDatasetRecord(incoming(), locationId);
+      allow delete: if isValidId(locationId);
+    }
+
+    // Collection: /alerts/{alertId}
+    match /alerts/{alertId} {
+      allow get, list: if isValidRequestContext();
+      allow create, update: if isValidHydraDatasetRecord(incoming(), alertId);
+      allow delete: if isValidId(alertId);
+    }
+
+    // Collection: /care_episodes/{careEpisodeId}
+    match /care_episodes/{careEpisodeId} {
+      allow get, list: if isValidRequestContext();
+      allow create, update: if isValidHydraDatasetRecord(incoming(), careEpisodeId);
+      allow delete: if isValidId(careEpisodeId);
+    }
+
+    // Collection: /photos/{photoId}
+    match /photos/{photoId} {
+      allow get, list: if isValidRequestContext();
+      allow create, update: if isValidHydraDatasetRecord(incoming(), photoId);
+      allow delete: if isValidId(photoId);
     }
 
     // Collection: /sightings/{sightingId}
     match /sightings/{sightingId} {
-      allow get: if isSignedIn() && isValidId(sightingId) && (existing().ownerId == request.auth.uid || isAdmin());
-      allow list: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
-
-      allow create: if isVerifiedUser()
-        && isValidId(sightingId)
-        && isValidSightingLog(incoming())
-        && incoming().createdAt == request.time
-        && incoming().updatedAt == request.time
-        && exists(/databases/$(database)/documents/cats/$(incoming().catId))
-        && (
-          get(/databases/$(database)/documents/cats/$(incoming().catId)).data.ownerId == request.auth.uid ||
-          isAdmin()
-        );
-
-      allow update: if isVerifiedUser()
-        && isValidId(sightingId)
-        && isValidSightingLog(incoming())
-        && incoming().ownerId == existing().ownerId
-        && incoming().catId == existing().catId
-        && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time
-        && (
-          isAdmin() ||
-          (
-            existing().ownerId == request.auth.uid &&
-            incoming().diff(existing()).affectedKeys().hasOnly([
-              'behaviorNotes',
-              'healthObservation',
-              'fedStatus',
-              'aiAnalysisSummary',
-              'photoUrl',
-              'updatedAt'
-            ])
-          )
-        );
-
-      allow delete: if isVerifiedUser() && isValidId(sightingId) && (existing().ownerId == request.auth.uid || isAdmin());
+      allow get, list: if isValidRequestContext();
+      allow create, update: if isValidId(sightingId) && incoming().catId is string && incoming().catId.size() <= 128;
+      allow delete: if isValidId(sightingId);
     }
 
     // Collection: /stations/{stationId}
     match /stations/{stationId} {
-      allow get: if isSignedIn() && isValidId(stationId) && (existing().ownerId == request.auth.uid || isAdmin());
-      allow list: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
-
-      allow create: if isVerifiedUser()
-        && isValidId(stationId)
-        && isValidFeedingStation(incoming())
-        && incoming().createdAt == request.time
-        && incoming().updatedAt == request.time;
-
-      allow update: if isVerifiedUser()
-        && isValidId(stationId)
-        && isValidFeedingStation(incoming())
-        && incoming().ownerId == existing().ownerId
-        && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time
-        && (
-          isAdmin() ||
-          (
-            existing().ownerId == request.auth.uid &&
-            incoming().diff(existing()).affectedKeys().hasOnly([
-              'stationName',
-              'colonyZone',
-              'supplyLevel',
-              'waterStatus',
-              'dailyCatCount',
-              'assignedCaretaker',
-              'notes',
-              'updatedAt'
-            ])
-          )
-        );
-
-      allow delete: if isVerifiedUser() && isValidId(stationId) && (existing().ownerId == request.auth.uid || isAdmin());
-    }
-
-    // Collection: /admins/{adminId}
-    match /admins/{adminId} {
-      allow get: if isSignedIn() && isValidId(adminId) && (request.auth.uid == adminId || isAdmin());
-      allow list: if isAdmin();
-      allow create, update: if isAdmin() && isValidId(adminId) && isValidAdminRecord(incoming()) && incoming().uid == adminId;
-      allow delete: if isAdmin() && isValidId(adminId);
+      allow get, list: if isValidRequestContext();
+      allow create, update: if isValidId(stationId) && incoming().stationName is string && incoming().stationName.size() <= 128;
+      allow delete: if isValidId(stationId);
     }
   }
 }

@@ -17,33 +17,94 @@ export const HYDRA_ZONES: HydraZone[] = [
   'Mandraki',
 ];
 
+export type CoatTypeOption =
+  | 'solid black'
+  | 'solid white'
+  | 'solid blue'
+  | 'tabby-classic'
+  | 'tabby-mackerel'
+  | 'tabby-spotted'
+  | 'tabby-ticked'
+  | 'ginger/orange tabby'
+  | 'calico'
+  | 'tortoiseshell/blended'
+  | 'bicolour/tuxedo'
+  | 'colourpoint'
+  | 'unknown';
+
+export type DominantColorOption =
+  | 'white'
+  | 'black'
+  | 'ginger'
+  | 'grey'
+  | 'dilute ginger/cream'
+  | 'mixed'
+  | 'unknown';
+
 export type CatSex = 'Female' | 'Male' | 'Unknown';
 
 export type TnrStatus =
+  | 'Sterilised'
+  | 'Unsterilised'
+  | 'Unknown'
   | 'Sterilized (Ear-Tipped)'
   | 'Intact - Priority TNR'
   | 'Kitten - Underage'
   | 'Scheduled';
 
 export const TNR_STATUSES: TnrStatus[] = [
-  'Sterilized (Ear-Tipped)',
-  'Intact - Priority TNR',
-  'Kitten - Underage',
-  'Scheduled',
+  'Sterilised',
+  'Unsterilised',
+  'Unknown',
 ];
+
+export type EstimatedAge =
+  | 'Newborn'
+  | 'Kitten'
+  | 'Junior'
+  | 'Adult'
+  | 'Senior'
+  | 'Unknown';
+
+export type BodyConditionStatus =
+  | 'Underweight'
+  | 'Ideal'
+  | 'Overweight'
+  | 'Obese'
+  | 'Unknown';
 
 export type HealthStatus =
   | 'Healthy'
+  | 'Minor issues'
+  | 'Compromised'
+  | 'Threat to life'
+  | 'Moribund'
+  | 'Dead'
+  | 'Unknown'
   | 'Monitor'
   | 'Needs Vet Care'
   | 'In Treatment';
 
 export const HEALTH_STATUSES: HealthStatus[] = [
   'Healthy',
-  'Monitor',
-  'Needs Vet Care',
-  'In Treatment',
+  'Minor issues',
+  'Compromised',
+  'Threat to life',
+  'Moribund',
+  'Dead',
+  'Unknown',
 ];
+
+export type ReproductiveStatusOption =
+  | 'Unknown'
+  | 'In heat'
+  | 'Pregnant'
+  | 'Nursing';
+
+export type VetCareStatusOption =
+  | 'Currently under care'
+  | 'Returned from vet'
+  | 'Unknown';
 
 export type FedStatus =
   | 'Fed & Watered'
@@ -100,6 +161,12 @@ export interface CatProfile {
   lastSeenText: string;
   ownerId: string;
   reporterName: string;
+  photoTransform?: {
+    zoom: number;
+    panX: number;
+    panY: number;
+    rotation: number;
+  };
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 }

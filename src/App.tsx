@@ -57,8 +57,9 @@ import {
 import { CatVisualAvatar } from './utils/catIllustrations';
 import { AiScannerPanel } from './components/AiScannerModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { FelisIdLensPage, PawAiStarIcon } from './felisid/FelisIdLensPage';
 
-type ActiveSection = 'registry' | 'sightings' | 'ai-scanner' | 'stations';
+type ActiveSection = 'registry' | 'sightings' | 'ai-scanner' | 'lens' | 'stations';
 
 function generateSafeId(prefix: string): string {
   const randomPart = Math.random().toString(36).substring(2, 10);
@@ -760,6 +761,18 @@ export function WhiskerWatchHydraContent() {
           </button>
           <button
             type="button"
+            onClick={() => setActiveSection('lens')}
+            className={`inline-flex items-center gap-1.5 hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 pb-0.5 ${
+              activeSection === 'lens'
+                ? 'text-slate-900 border-b-2 border-teal-700'
+                : ''
+            }`}
+          >
+            <PawAiStarIcon className="w-4 h-4 text-teal-700" />
+            <span>Lens</span>
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveSection('stations')}
             className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 pb-0.5 ${
               activeSection === 'stations'
@@ -832,6 +845,7 @@ export function WhiskerWatchHydraContent() {
                     ['registry', 'Registry'],
                     ['sightings', 'Sightings'],
                     ['ai-scanner', 'AI Scanner'],
+                    ['lens', 'Lens'],
                     ['stations', 'Stations'],
                   ] as const
                 ).map(([key, label]) => (
@@ -1169,6 +1183,7 @@ export function WhiskerWatchHydraContent() {
                               cat.tnrStatus === 'Sterilized (Ear-Tipped)'
                             }
                             photoUrl={cat.photoUrl}
+                            photoTransform={cat.photoTransform}
                             className="w-full h-44"
                           />
 
@@ -1546,6 +1561,13 @@ export function WhiskerWatchHydraContent() {
                     ))}
                   </div>
                 )}
+              </section>
+            )}
+
+            {/* SECTION 5: FELISID-LENS TAB */}
+            {activeSection === 'lens' && (
+              <section className="rounded-2xl overflow-hidden border border-slate-800 shadow-xl">
+                <FelisIdLensPage />
               </section>
             )}
           </>

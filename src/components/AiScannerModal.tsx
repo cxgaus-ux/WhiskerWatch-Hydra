@@ -168,7 +168,7 @@ export const AiScannerPanel: React.FC<AiScannerPanelProps> = ({
               src={previewDataUrl}
               alt="Selected Hydra cat for AI analysis"
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
             <button
               type="button"

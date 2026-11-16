@@ -2835,6 +2835,7 @@ export const IdMarksFormEditor: React.FC<{
 }) => {
   const aiSummary = aiSummaryDescription ?? aiDescription;
   const norm = normalizeIdMarks(taxonomy);
+  const [showIdMarksInfo, setShowIdMarksInfo] = useState(false);
 
   const handleSelectField = (
     fieldKey: IdMarksFieldKey,
@@ -2856,20 +2857,23 @@ export const IdMarksFormEditor: React.FC<{
 
   return (
     <div className="space-y-3">
-      <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2.5">
+      <div className="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2">
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400 text-sm">
               🐾
             </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-extrabold text-white tracking-tight">
-                IDMarks
-              </h3>
-              <p className="text-[11px] text-slate-400">
-                Coat type, dominant colour, % white distribution, and unique fingerprints
-              </p>
-            </div>
+            <h3 className="text-sm font-extrabold text-white tracking-tight">
+              IDMarks
+            </h3>
+            <button
+              type="button"
+              onClick={() => setShowIdMarksInfo(true)}
+              title="IDMarks instructions"
+              className="w-5 h-5 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-teal-300 font-serif italic font-bold text-[11px] flex items-center justify-center cursor-pointer"
+            >
+              i
+            </button>
           </div>
           {onReanalyse && (
             <button
@@ -2884,19 +2888,58 @@ export const IdMarksFormEditor: React.FC<{
         </div>
 
         {isAnalysing ? (
-          <div className="p-3 rounded-xl bg-teal-950/30 border border-teal-500/40 flex items-center gap-2.5 text-xs text-teal-200">
+          <div className="p-2.5 rounded-xl bg-teal-950/30 border border-teal-500/40 flex items-center gap-2 text-xs text-teal-200">
             <span>Extracting IDMarks from photo...</span>
           </div>
         ) : (
           aiSummary &&
           aiSummary.toLowerCase() !== 'unknown' && (
-            <div className="p-3 rounded-xl bg-slate-900/90 border border-teal-800/50 space-y-1">
+            <div className="p-2.5 rounded-xl bg-slate-900/90 border border-teal-800/50 space-y-1">
               <div className="text-[11px] font-bold text-teal-300">AI IDMarks Summary</div>
               <p className="text-xs text-slate-300 leading-relaxed">{aiSummary}</p>
             </div>
           )
         )}
       </div>
+
+      {showIdMarksInfo && (
+        <div
+          onClick={() => setShowIdMarksInfo(false)}
+          style={{ zIndex: 3500 }}
+          className="fixed inset-0 z-[3000] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-sm p-5 shadow-2xl space-y-3"
+          >
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-teal-500/20 border border-teal-500/40 text-teal-300 font-serif italic font-bold text-xs flex items-center justify-center">
+                  i
+                </span>
+                <h4 className="text-sm font-extrabold text-white">IDMarks Guide</h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowIdMarksInfo(false)}
+                className="text-slate-400 hover:text-white text-xs font-bold px-2 py-1 rounded-lg bg-slate-800 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Select or review the cat&apos;s coat type, dominant coat colour, percent white distribution, and unique fingerprints. Confirmed entries are marked with ✓.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowIdMarksInfo(false)}
+              className="w-full py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs cursor-pointer"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
 
       <IdMarksInteractiveSection
         taxonomy={norm}
